@@ -20,3 +20,10 @@
 
 > 5. 配置kibana.yaml  
 > kubectl apply -f kibana.yaml 
+> 
+> 
+> 6. 查看密码  
+> kubectl get secret quickstart-es-elastic-user -o go-template='{{.data.elastic | base64decode}}' -n test  
+> quickstart集群名称  
+>   
+> 7. 登录 采取https登录，用户名elastic  密码通过步骤6获取
