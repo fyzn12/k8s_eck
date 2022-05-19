@@ -1,0 +1,68 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: quickstart
+  namespace: test
+spec:
+  version: 8.2.0
+  volumeClaimDeletePolicy: DeleteOnScaledownOnly
+  nodeSets:
+  - name: es-master
+    count: 1
+    config:
+      node.store.allow_mmap: true
+      #xpack.monitoring.enabled: true
+      #xpack.monitoring.collection.enabled: true
+      indices.breaker.total.use_real_memory: false   # 关键参数，影响es性能
+      indices.fielddata.cache.size: 40%   # 关键参数，影响es性能
+      indices.query.bool.max_clause_count: 4096
+      indices.memory.index_buffer_size: "25%"
+    podTemplate:
+      spec:
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=655360']
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data # Do not change this name unless you set up a volume mount for the data path.
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi   # 申请的pv空间
+        storageClassName: glusterfs  # 关联的存储类
+  - name: es-data
+    count: 2
+    config:
+      node.roles: ["data"]   # 数据节点
+      node.store.allow_mmap: true
+      #xpack.monitoring.enabled: false
+      #xpack.monitoring.collection.enabled: false
+      indices.breaker.total.use_real_memory: false
+      indices.fielddata.cache.size: 40%
+      indices.query.bool.max_clause_count: 40960
+      indices.memory.index_buffer_size: "25%"
+    podTemplate:
+      spec:
+        initContainers:
+        - name: sysctl
+          securityContext:
+            privileged: true
+          command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data # Do not change this name unless you set up a volume mount for the data path.
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi   # 申请的pv空间
+        storageClassName: glusterfs  # 关联的存储类
+  http:
+    service:
+      spec:
+        type: NodePort

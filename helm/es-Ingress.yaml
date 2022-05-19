@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: elasticsearch-ingress
+  namespace: elk
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+#    kubernetes.io/ingress.class: addon-http-application-routing
+# http://elk-test.chinaeast2.cloudapp.chinacloudapi.cn:8000/
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: quickstart-es-http
+                port:
+                  number: 9200

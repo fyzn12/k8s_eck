@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/elasticsearch-cluster.iml" filepath="$PROJECT_DIR$/elasticsearch-cluster.iml" />
+      <module fileurl="file://$PROJECT_DIR$/helm/helm.iml" filepath="$PROJECT_DIR$/helm/helm.iml" />
+    </modules>
+  </component>
+</project>
